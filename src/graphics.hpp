@@ -1,11 +1,24 @@
 #pragma once
 
+#include <array>
 #include <Windows.h>
 
 #include <gdiplus.h>
 
 constexpr int WINDOW_WIDTH  = 320;
 constexpr int WINDOW_HEIGHT = 180;
+
+struct RenderingInfo {
+	const int leverX; // -1 or 0 or 1
+	const int leverY; // -1 or 0 or 1
+	const std::array<bool, 8> &buttons;
+
+	RenderingInfo(int leverX, int leverY, const std::array<bool, 8> &buttons):
+		leverX(leverX),
+		leverY(leverY),
+		buttons(buttons)
+	{}
+};
 
 class GdiplusSession {
 private:
@@ -23,8 +36,10 @@ private:
 	const Gdiplus::SolidBrush _brushGray;
 	const Gdiplus::SolidBrush _brushWight;
 
+	void _draw(HDC hdc, RenderingInfo info) const;
+
 public:
 	Graphics();
 
-	void draw(HWND window) const;
+	void draw(HWND window, RenderingInfo info) const;
 };

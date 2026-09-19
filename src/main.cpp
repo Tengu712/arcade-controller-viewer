@@ -1,3 +1,4 @@
+#include "bridge.hpp"
 #include "graphics.hpp"
 #include "input.hpp"
 
@@ -5,6 +6,8 @@ constexpr LPCWSTR WINDOW_CLASS_NAME = L"arcade-controller-viewer";
 
 struct Context {
 	Graphics graphics;
+	InputState input;
+	Bridge bridge;
 };
 
 LRESULT CALLBACK processWindowMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -27,7 +30,7 @@ LRESULT CALLBACK processWindowMessage(HWND window, UINT msg, WPARAM wParam, LPAR
 		return 1;
 	case WM_PAINT:
 		if (context) {
-			context->graphics.draw(window);
+			context->graphics.draw(window, context->bridge.bridge(context->input));
 			return 0;
 		}
 		break;
@@ -60,9 +63,9 @@ void registerWindowClass(HINSTANCE instance) {
 	}
 }
 
-void createWindow(HINSTANCE instance, Context *context) {
+HWND createWindow(HINSTANCE instance, Context *context) {
 	const auto window = CreateWindowExW(
-		WS_EX_COMPOSITED | WS_EX_LAYERED | WS_EX_TOOLWINDOW,
+		WS_EX_TOOLWINDOW,
 		WINDOW_CLASS_NAME,
 		L"arcade controller viewer",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_VISIBLE,
@@ -79,16 +82,15 @@ void createWindow(HINSTANCE instance, Context *context) {
 	if (!window) {
 		throw L"failed to create window";
 	}
-	if (!SetLayeredWindowAttributes(window, 0, 255, LWA_ALPHA)) {
-		throw L"failed to set alpha to window";
-	}
+
+	return window;
 }
 
 void run(HINSTANCE instance) {
 	Context context;
 
 	registerWindowClass(instance);
-	createWindow(instance, &context);
+	const auto window = createWindow(instance, &context);
 
 	const auto timer = CreateWaitableTimerExW(
 		NULL,
@@ -112,9 +114,8 @@ void run(HINSTANCE instance) {
 			continue;
 		}
 
-		// TODO:
-		const auto inputState = getControllerInputState();
-		(void)inputState;
+		context.input.sync();
+		RedrawWindow(window, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 
 		LARGE_INTEGER time;
 		time.QuadPart = -166666;

@@ -6,11 +6,13 @@ cl ^
 	/std:c++20 ^
 	/W4 /WX ^
 	/Fe:"acv.exe" ^
+	src\bridge.cpp ^
 	src\graphics.cpp ^
 	src\input.cpp ^
 	src\main.cpp ^
 	gdiplus.lib ^
 	user32.lib ^
+	uxtheme.lib ^
 	xinput.lib ^
 	/link ^
 	/SUBSYSTEM:WINDOWS

@@ -2,8 +2,8 @@
 
 #include "input.hpp"
 
-#include <array>
 #include <utility>
+#include <uxtheme.h>
 
 namespace {
 	const std::array<std::pair<int, int>, 8> BUTTON_POSITIONS{
@@ -42,10 +42,7 @@ Graphics::Graphics():
 	_brushWight(Gdiplus::Color(255, 255, 255, 255))
 {}
 
-void Graphics::draw(HWND window) const {
-	PAINTSTRUCT ps;
-	const auto hdc = BeginPaint(window, &ps);
-
+void Graphics::_draw(HDC hdc, RenderingInfo info) const {
 	Gdiplus::Graphics g(hdc);
 	g.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 
@@ -53,12 +50,29 @@ void Graphics::draw(HWND window) const {
 	g.FillRectangle(&_brushBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// lever
-	g.FillEllipse(&_brushWight, 30, 55, 32, 32);
+	g.FillEllipse(&_brushGray, 30, 55, 32, 32);
+	g.FillEllipse(&_brushWight, 30 + 16 * info.leverX, 55 + 16 * info.leverY, 32, 32);
 
 	// buttons
 	for (int i = 0; i < BUTTON_POSITIONS.size(); ++i) {
-		g.FillEllipse(&_brushGray, BUTTON_POSITIONS[i].first, BUTTON_POSITIONS[i].second, 32, 32);
+		g.FillEllipse(
+			info.buttons[i] ? &_brushWight : &_brushGray,
+			BUTTON_POSITIONS[i].first,
+			BUTTON_POSITIONS[i].second,
+			32,
+			32
+		);
 	}
+}
 
+void Graphics::draw(HWND window, RenderingInfo info) const {
+	PAINTSTRUCT ps;
+	const auto hdc = BeginPaint(window, &ps);
+	HDC hdcBuf;
+	const auto buffer = BeginBufferedPaint(hdc, &ps.rcPaint, BPBF_COMPATIBLEBITMAP, NULL, &hdcBuf);
+
+	_draw(hdcBuf, info);
+
+	EndBufferedPaint(buffer, TRUE);
 	EndPaint(window, &ps);
 }

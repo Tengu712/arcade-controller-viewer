@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <unordered_set>
 #include <Windows.h>
 
 enum class AxisXInput {
@@ -16,15 +16,15 @@ enum class AxisYInput {
 };
 
 struct InputState {
-	std::unordered_map<WORD, bool> buttons;
-	AxisXInput                     axisX;
-	AxisYInput                     axisY;
+	AxisXInput               axisX;
+	AxisYInput               axisY;
+	std::unordered_set<WORD> buttons;
 
 	InputState():
-		buttons{},
 		axisX(AxisXInput::Neutral),
-		axisY(AxisYInput::Neutral)
+		axisY(AxisYInput::Neutral),
+		buttons{}
 	{}
-};
 
-InputState getControllerInputState();
+	void sync();
+};
