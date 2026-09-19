@@ -1,7 +1,6 @@
 #pragma once
 
-#include <unordered_set>
-#include <Windows.h>
+#include <array>
 
 enum class AxisXInput {
 	Neutral,
@@ -16,9 +15,9 @@ enum class AxisYInput {
 };
 
 struct InputState {
-	AxisXInput               axisX;
-	AxisYInput               axisY;
-	std::unordered_set<WORD> buttons;
+	AxisXInput           axisX;
+	AxisYInput           axisY;
+	std::array<bool, 16> buttons;
 
 	InputState():
 		axisX(AxisXInput::Neutral),
@@ -26,5 +25,5 @@ struct InputState {
 		buttons{}
 	{}
 
-	void sync();
+	bool sync();
 };

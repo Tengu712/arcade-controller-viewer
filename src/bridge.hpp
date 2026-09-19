@@ -8,7 +8,7 @@
 
 class Bridge {
 private:
-	std::vector<WORD> _map;
+	std::vector<size_t> _map;
 	std::array<bool, 8> _buttons;
 
 public:

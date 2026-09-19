@@ -109,10 +109,12 @@ void run(HINSTANCE instance) {
 		}
 
 		timer.wait();
-		context.input.sync();
-		timer.set();
 
-		RedrawWindow(window, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+		if (context.input.sync()) {
+			RedrawWindow(window, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+		}
+
+		timer.set();
 	}
 
 	UnregisterClassW(WINDOW_CLASS_NAME, instance);
