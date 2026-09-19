@@ -1,25 +1,45 @@
+#include "graphics.hpp"
 #include "input.hpp"
-
-#include <iostream>
 
 constexpr LPCWSTR WINDOW_CLASS_NAME = L"arcade-controller-viewer";
 
-LRESULT processWindowMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+struct Context {
+	Graphics graphics;
+};
+
+LRESULT CALLBACK processWindowMessage(HWND window, UINT msg, WPARAM wParam, LPARAM lParam) {
+	auto context = reinterpret_cast<Context *>(GetWindowLongPtrW(window, GWLP_USERDATA));
+
 	switch (msg) {
+	case WM_NCCREATE: {
+		const auto cs = reinterpret_cast<CREATESTRUCTW *>(lParam);
+		const auto lp = reinterpret_cast<LONG_PTR>(cs->lpCreateParams);
+		SetWindowLongPtrW(window, GWLP_USERDATA, lp);
+		break;
+	}
+	case WM_CLOSE:
+		DestroyWindow(window);
+		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-	default:
-		return DefWindowProcW(window, msg, wParam, lParam);
+	case WM_ERASEBKGND:
+		return 1;
+	case WM_PAINT:
+		if (context) {
+			context->graphics.draw(window);
+			return 0;
+		}
+		break;
 	}
+
+	return DefWindowProcW(window, msg, wParam, lParam);
 }
 
-// TODO: draw
-
-bool registerWindowClass(HINSTANCE instance) {
+void registerWindowClass(HINSTANCE instance) {
 	WNDCLASSEXW wndCls;
 	if (GetClassInfoExW(instance, WINDOW_CLASS_NAME, &wndCls)) {
-		return false;
+		return;
 	}
 
 	wndCls.cbSize        = sizeof(WNDCLASSEXW);
@@ -35,15 +55,12 @@ bool registerWindowClass(HINSTANCE instance) {
 	wndCls.lpszClassName = WINDOW_CLASS_NAME;
 	wndCls.hIconSm       = NULL;
 
-	return RegisterClassExW(&wndCls) != 0;
+	if (!RegisterClassExW(&wndCls)) {
+		throw L"failed to register window class";
+	}
 }
 
-int WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int showingStyle) {
-	if (!registerWindowClass(instance)) {
-		MessageBoxW(NULL, L"failed to register window class", L"Error", MB_OK);
-		return 1;
-	}
-
+void createWindow(HINSTANCE instance, Context *context) {
 	const auto window = CreateWindowExW(
 		WS_EX_COMPOSITED | WS_EX_LAYERED | WS_EX_TOOLWINDOW,
 		WINDOW_CLASS_NAME,
@@ -51,21 +68,27 @@ int WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int showingStyle) {
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_VISIBLE,
 		0,
 		0,
-		320,
-		180,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT,
 		NULL,
 		NULL,
 		instance,
-		NULL
+		context
 	);
+
 	if (!window) {
-		MessageBoxW(NULL, L"failed to create window", L"Error", MB_OK);
-		return 1;
+		throw L"failed to create window";
 	}
-	if (!ShowWindow(window, showingStyle)) {
-		MessageBoxW(NULL, L"failed to show window", L"Error", MB_OK);
-		return 1;
+	if (!SetLayeredWindowAttributes(window, 0, 255, LWA_ALPHA)) {
+		throw L"failed to set alpha to window";
 	}
+}
+
+void run(HINSTANCE instance) {
+	Context context;
+
+	registerWindowClass(instance);
+	createWindow(instance, &context);
 
 	const auto timer = CreateWaitableTimerExW(
 		NULL,
@@ -74,13 +97,12 @@ int WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int showingStyle) {
 		TIMER_ALL_ACCESS
 	);
 	if (!timer) {
-		MessageBoxW(NULL, L"failed to create timer", L"Error", MB_OK);
-		return 1;
+		throw L"failed to create timer";
 	}
 
 	MSG msg;
 	while (true) {
-		if (PeekMessageW(&msg, window, 0, 0, PM_REMOVE)) {
+		if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (msg.message == WM_QUIT) {
 				break;
 			}
@@ -102,5 +124,14 @@ int WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int showingStyle) {
 
 	CloseHandle(timer);
 	UnregisterClassW(WINDOW_CLASS_NAME, instance);
-	return 0;
+}
+
+int WinMain(HINSTANCE instance, HINSTANCE, LPSTR, int) {
+	try {
+		run(instance);
+		return 0;
+	} catch (LPCWSTR msg) {
+		MessageBoxW(NULL, msg, L"Error", MB_OK);
+		return 1;
+	}
 }

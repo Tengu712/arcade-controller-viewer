@@ -1,4 +1,17 @@
 @echo off
 
-cl /EHsc /Fe:"acv.exe" /std:c++20 /utf-8 /W4 /WX src\main.cpp src\input.cpp user32.lib xinput.lib /link /SUBSYSTEM:WINDOWS
+cl ^
+	/EHsc ^
+	/utf-8 ^
+	/std:c++20 ^
+	/W4 /WX ^
+	/Fe:"acv.exe" ^
+	src\graphics.cpp ^
+	src\input.cpp ^
+	src\main.cpp ^
+	gdiplus.lib ^
+	user32.lib ^
+	xinput.lib ^
+	/link ^
+	/SUBSYSTEM:WINDOWS
 del *.obj
