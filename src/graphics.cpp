@@ -7,14 +7,14 @@
 
 namespace {
 	const std::array<std::pair<int, int>, 8> BUTTON_POSITIONS{
-		std::make_pair(100, 34),
-		std::make_pair(140, 20),
-		std::make_pair(180, 18),
-		std::make_pair(220, 16),
-		std::make_pair( 95, 76),
-		std::make_pair(135, 62),
-		std::make_pair(175, 60),
-		std::make_pair(215, 58),
+		std::make_pair(100, 32),
+		std::make_pair(140, 18),
+		std::make_pair(180, 16),
+		std::make_pair(220, 14),
+		std::make_pair( 95, 74),
+		std::make_pair(135, 60),
+		std::make_pair(175, 58),
+		std::make_pair(215, 56),
 	};
 
 	ULONG_PTR createGdiPlusToken() {
@@ -40,12 +40,12 @@ void Graphics::_draw(HDC hdc, RenderingInfo &info) const {
 	Gdiplus::Graphics g(hdc);
 	g.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 
-	// back ground
-	g.FillRectangle(&_brushBG, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	// background
+	g.FillRectangle(&_brushBG, 0, 0, CLIENT_WIDTH, CLIENT_HEIGHT);
 
 	// lever
-	g.FillEllipse(&_brushGray, 30, 55, 32, 32);
-	g.FillEllipse(&_brushWight, 30 + 16 * info.leverX, 55 + 16 * info.leverY, 32, 32);
+	g.FillEllipse(&_brushGray, 30, 53, 32, 32);
+	g.FillEllipse(&_brushWight, 30 + 16 * info.leverX, 53 + 16 * info.leverY, 32, 32);
 
 	// buttons
 	for (size_t i = 0; i < BUTTON_POSITIONS.size(); ++i) {

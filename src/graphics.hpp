@@ -5,8 +5,8 @@
 
 #include <gdiplus.h>
 
-constexpr int WINDOW_WIDTH  = 320;
-constexpr int WINDOW_HEIGHT = 180;
+constexpr int CLIENT_WIDTH  = 266;
+constexpr int CLIENT_HEIGHT = 120;
 
 struct RenderingInfo {
 	const int leverX; // -1 or 0 or 1

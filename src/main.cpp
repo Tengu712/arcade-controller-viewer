@@ -72,8 +72,8 @@ HWND createWindow(HINSTANCE instance, Context *context) {
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_VISIBLE,
 		0,
 		0,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		CLIENT_WIDTH,
+		CLIENT_HEIGHT,
 		NULL,
 		NULL,
 		instance,
@@ -82,6 +82,27 @@ HWND createWindow(HINSTANCE instance, Context *context) {
 
 	if (!window) {
 		throw L"failed to create window";
+	}
+
+	RECT rc{0, 0, CLIENT_WIDTH, CLIENT_HEIGHT};
+	if (!AdjustWindowRectEx(
+		&rc,
+		GetWindowLongW(window, GWL_STYLE),
+		GetMenu(window) != nullptr,
+		GetWindowLongW(window, GWL_EXSTYLE)
+	)) {
+		throw L"failed to adjust window size";
+	}
+	if (!SetWindowPos(
+		window,
+		nullptr,
+		0,
+		0,
+		rc.right - rc.left,
+		rc.bottom - rc.top,
+		SWP_NOMOVE | SWP_NOZORDER
+	)) {
+		throw L"failed to resize window";
 	}
 
 	return window;
