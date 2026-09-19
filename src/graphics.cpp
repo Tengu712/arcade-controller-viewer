@@ -36,13 +36,7 @@ GdiplusSession::~GdiplusSession() {
 	Gdiplus::GdiplusShutdown(_token);
 }
 
-Graphics::Graphics():
-	_brushBG   (Gdiplus::Color(255,   0,   0,   0)),
-	_brushGray (Gdiplus::Color(255, 128, 128, 128)),
-	_brushWight(Gdiplus::Color(255, 255, 255, 255))
-{}
-
-void Graphics::_draw(HDC hdc, RenderingInfo info) const {
+void Graphics::_draw(HDC hdc, RenderingInfo &info) const {
 	Gdiplus::Graphics g(hdc);
 	g.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 
@@ -54,7 +48,7 @@ void Graphics::_draw(HDC hdc, RenderingInfo info) const {
 	g.FillEllipse(&_brushWight, 30 + 16 * info.leverX, 55 + 16 * info.leverY, 32, 32);
 
 	// buttons
-	for (int i = 0; i < BUTTON_POSITIONS.size(); ++i) {
+	for (size_t i = 0; i < BUTTON_POSITIONS.size(); ++i) {
 		g.FillEllipse(
 			info.buttons[i] ? &_brushWight : &_brushGray,
 			BUTTON_POSITIONS[i].first,

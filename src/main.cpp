@@ -1,6 +1,7 @@
 #include "bridge.hpp"
 #include "graphics.hpp"
 #include "input.hpp"
+#include "timer.hpp"
 
 constexpr LPCWSTR WINDOW_CLASS_NAME = L"arcade-controller-viewer";
 
@@ -88,19 +89,12 @@ HWND createWindow(HINSTANCE instance, Context *context) {
 
 void run(HINSTANCE instance) {
 	Context context;
+	const Timer timer;
 
 	registerWindowClass(instance);
 	const auto window = createWindow(instance, &context);
 
-	const auto timer = CreateWaitableTimerExW(
-		NULL,
-		NULL,
-		CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
-		TIMER_ALL_ACCESS
-	);
-	if (!timer) {
-		throw L"failed to create timer";
-	}
+	timer.set();
 
 	MSG msg;
 	while (true) {
@@ -114,16 +108,13 @@ void run(HINSTANCE instance) {
 			continue;
 		}
 
+		timer.wait();
 		context.input.sync();
-		RedrawWindow(window, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+		timer.set();
 
-		LARGE_INTEGER time;
-		time.QuadPart = -166666;
-		SetWaitableTimer(timer, &time, 0, NULL, NULL, false);
-		WaitForSingleObject(timer, INFINITE);
+		RedrawWindow(window, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 
-	CloseHandle(timer);
 	UnregisterClassW(WINDOW_CLASS_NAME, instance);
 }
 

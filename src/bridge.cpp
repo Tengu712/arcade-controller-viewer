@@ -2,13 +2,6 @@
 
 #include <algorithm>
 
-Bridge::Bridge():
-	_map{},
-	_buttons{false, false, false, false, false, false, false, false}
-{
-	_map.reserve(8);
-}
-
 RenderingInfo Bridge::bridge(const InputState &input) {
 	// register buttons mapping
 	if (_map.size() < 8) {

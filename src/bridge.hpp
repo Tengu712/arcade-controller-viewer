@@ -12,7 +12,12 @@ private:
 	std::array<bool, 8> _buttons;
 
 public:
-	Bridge();
+	Bridge():
+		_map{},
+		_buttons{}
+	{
+		_map.reserve(8);
+	}
 
 	RenderingInfo bridge(const InputState &input);
 };

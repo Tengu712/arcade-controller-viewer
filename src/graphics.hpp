@@ -25,6 +25,9 @@ private:
 	const ULONG_PTR _token;
 
 public:
+	GdiplusSession(const GdiplusSession &) = delete;
+	GdiplusSession &operator =(const GdiplusSession &) = delete;
+
 	GdiplusSession();
 	~GdiplusSession();
 };
@@ -36,10 +39,15 @@ private:
 	const Gdiplus::SolidBrush _brushGray;
 	const Gdiplus::SolidBrush _brushWight;
 
-	void _draw(HDC hdc, RenderingInfo info) const;
+	void _draw(HDC hdc, RenderingInfo &info) const;
 
 public:
-	Graphics();
+	Graphics():
+		_session(),
+		_brushBG   (Gdiplus::Color(255,   0,   0,   0)),
+		_brushGray (Gdiplus::Color(255, 128, 128, 128)),
+		_brushWight(Gdiplus::Color(255, 255, 255, 255))
+	{}
 
 	void draw(HWND window, RenderingInfo info) const;
 };
