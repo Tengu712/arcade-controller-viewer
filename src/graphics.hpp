@@ -9,11 +9,11 @@ constexpr int CLIENT_WIDTH  = 266;
 constexpr int CLIENT_HEIGHT = 120;
 
 struct RenderingInfo {
-	const int leverX; // -1 or 0 or 1
-	const int leverY; // -1 or 0 or 1
+	const double leverX; // -1.0 or 0.0 or 1.0
+	const double leverY; // -1.0 or 0.0 or 1.0
 	const std::array<bool, 8> &buttons;
 
-	RenderingInfo(int leverX, int leverY, const std::array<bool, 8> &buttons):
+	RenderingInfo(double leverX, double leverY, const std::array<bool, 8> &buttons):
 		leverX(leverX),
 		leverY(leverY),
 		buttons(buttons)

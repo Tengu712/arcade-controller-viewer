@@ -2,6 +2,7 @@
 
 #include "input.hpp"
 
+#include <cmath>
 #include <utility>
 #include <uxtheme.h>
 
@@ -44,8 +45,18 @@ void Graphics::_draw(HDC hdc, RenderingInfo &info) const {
 	g.FillRectangle(&_brushBG, 0, 0, CLIENT_WIDTH, CLIENT_HEIGHT);
 
 	// lever
+	const auto k =
+		info.leverX * info.leverX > 0.0 && info.leverY * info.leverY > 0.0
+			? 1.0 / std::sqrt(2.0)
+			: 1.0;
 	g.FillEllipse(&_brushGray, 30, 53, 32, 32);
-	g.FillEllipse(&_brushWight, 30 + 16 * info.leverX, 53 + 16 * info.leverY, 32, 32);
+	g.FillEllipse(
+		&_brushWight,
+		static_cast<int>(30.0 + 16.0 * info.leverX * k),
+		static_cast<int>(53.0 + 16.0 * info.leverY * k),
+		32,
+		32
+	);
 
 	// buttons
 	for (size_t i = 0; i < BUTTON_POSITIONS.size(); ++i) {

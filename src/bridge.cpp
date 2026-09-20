@@ -17,15 +17,15 @@ RenderingInfo Bridge::bridge(const InputState &input) {
 
 	return {
 		input.axisX == AxisXInput::Left
-			? -1
+			? -1.0
 			: input.axisX == AxisXInput::Right
-			? 1
-			: 0,
+			? 1.0
+			: 0.0,
 		input.axisY == AxisYInput::Up
-			? -1
+			? -1.0
 			: input.axisY == AxisYInput::Down
-			? 1
-			: 0,
+			? 1.0
+			: 0.0,
 		_buttons,
 	};
 }
