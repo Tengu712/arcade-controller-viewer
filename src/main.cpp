@@ -66,7 +66,7 @@ void registerWindowClass(HINSTANCE instance) {
 
 HWND createWindow(HINSTANCE instance, Context *context) {
 	const auto window = CreateWindowExW(
-		WS_EX_TOOLWINDOW,
+		0,
 		WINDOW_CLASS_NAME,
 		L"arcade controller viewer",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_VISIBLE,
